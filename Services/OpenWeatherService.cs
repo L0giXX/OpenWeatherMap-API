@@ -6,21 +6,21 @@ namespace OpenWeatherMap_API.Services
 {
     public class OpenWeatherService : IOpenWeatherService
     {
-        public readonly string ApiKey;
+        private readonly string ApiKey;
 
-        public OpenWeatherService(IOptions<OpenWeatherSettings> openWeatherSettings)
+        private readonly IHttpClientFactory _httpClientFactory;
+
+        public OpenWeatherService(IOptions<OpenWeatherSettings> openWeatherSettings, IHttpClientFactory httpClientFactory)
         {
             ApiKey = openWeatherSettings.Value.ApiKey;
+            _httpClientFactory = httpClientFactory;
         }
-
-        private static readonly HttpClient _httpClient = new()
-        {
-            BaseAddress = new Uri("https://api.openweathermap.org/data/2.5/")
-        };
 
         public async Task<ResponseWeather?> GetCurrentWeatherForCity(string city)
         {
-            var response = await _httpClient.GetAsync($"/data/2.5/weather?q={city}&units=metric&appid={ApiKey}");
+            HttpClient client = _httpClientFactory.CreateClient("weather");
+
+            var response = await client.GetAsync($"https://api.openweathermap.org/data/2.5/weather?q={city}&units=metric&appid={ApiKey}");
 
             if (response.IsSuccessStatusCode)
             {
@@ -30,6 +30,7 @@ namespace OpenWeatherMap_API.Services
             }
 
             return null;
+
         }
     }
 }

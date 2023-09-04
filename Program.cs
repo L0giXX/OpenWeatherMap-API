@@ -10,19 +10,18 @@ namespace OpenWeatherMap_API
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
-
+            builder.Services.AddMemoryCache();
+            builder.Services.AddSingleton<IOpenWeatherService, OpenWeatherService>();
+            builder.Services.AddTransient<CachedWeatherHandler>();
+            builder.Services.AddHttpClient("weather").AddHttpMessageHandler<CachedWeatherHandler>();
+            builder.Services.Configure<OpenWeatherSettings>(builder.Configuration.GetSection("OpenWeather"));
 
             builder.Services.AddControllers();
-            builder.Services.Configure<OpenWeatherSettings>(builder.Configuration.GetSection("OpenWeather"));
-            builder.Services.AddSingleton<IOpenWeatherService, OpenWeatherService>();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
