@@ -2,7 +2,7 @@
 using System.Net;
 using System.Web;
 
-namespace OpenWeatherMap_API
+namespace OpenWeatherMap_API.Services
 {
     public class CachedWeatherHandler : DelegatingHandler
     {
