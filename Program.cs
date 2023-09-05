@@ -1,6 +1,5 @@
 using OpenWeatherMap_API.Models;
 using OpenWeatherMap_API.Services;
-
 namespace OpenWeatherMap_API
 {
     public class Program
@@ -10,6 +9,16 @@ namespace OpenWeatherMap_API
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            var CorsSettings = "_corsSettings";
+
+            // Allow access-control-allow-origin for htmx request
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy(name: CorsSettings, policy =>
+                {
+                    policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+                });
+            });
             builder.Services.AddMemoryCache();
             builder.Services.AddSingleton<IOpenWeatherService, OpenWeatherService>();
             builder.Services.AddTransient<CachedWeatherHandler>();
@@ -34,6 +43,8 @@ namespace OpenWeatherMap_API
 
 
             app.MapControllers();
+
+            app.UseCors(CorsSettings);
 
             app.Run();
         }
